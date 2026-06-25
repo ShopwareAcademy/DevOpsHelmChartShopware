@@ -1,0 +1,68 @@
+shopware:
+  image:
+    repository: shopware-devops-lp
+    tag: local
+    pullPolicy: IfNotPresent
+  replicas: 1
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: "500m"
+    limits:
+      memory: "3Gi"
+      cpu: "2000m"
+  env:
+    APP_URL: "http://shopware-helm.localhost"
+    APP_ENV: "prod"
+    SHOPWARE_HTTP_CACHE_ENABLED: "1"
+    SHOPWARE_HTTP_DEFAULT_TTL: "7200"
+    PHP_MEMORY_LIMIT: "1024M"
+    SHOPWARE_SKIP_BUNDLE_DUMP: "1"
+    INSTANCE_ID: "local-dev-instance"
+
+secrets:
+  APP_SECRET: "CHANGE-ME-in-values-override"
+  DATABASE_URL: "mysql://shopware:shopware@mysql:3306/shopware"
+  REDIS_URL: "redis://redis:6379"
+  LOCK_DSN: "redis://redis:6379/2"
+
+mysql:
+  enabled: true
+  image:
+    repository: mysql
+    tag: "8.0"
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "250m"
+    limits:
+      memory: "1Gi"
+      cpu: "1000m"
+  storage:
+    size: 5Gi
+  auth:
+    rootPassword: "root"
+    database: "shopware"
+    user: "shopware"
+    password: "shopware"
+
+redis:
+  enabled: true
+  image:
+    repository: valkey/valkey
+    tag: "8"
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "500m"
+
+ingress:
+  enabled: true
+  className: nginx
+  host: shopware-helm.localhost
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "32m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "120"

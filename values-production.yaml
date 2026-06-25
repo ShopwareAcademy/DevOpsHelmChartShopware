@@ -1,0 +1,22 @@
+shopware:
+  replicas: 3
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: "1000m"
+    limits:
+      memory: "2Gi"
+      cpu: "4000m"
+
+ingress:
+  host: shop.example.com
+
+mysql:
+  enabled: false
+
+redis:
+  enabled: false
+
+secrets:
+  DATABASE_URL: "mysql://shopware:PROD_PASSWORD@prod-mysql.example.com:3306/shopware"
+  REDIS_URL: "redis://prod-redis.example.com:6379"

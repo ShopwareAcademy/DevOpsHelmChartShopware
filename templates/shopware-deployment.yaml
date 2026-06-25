@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "shopware.fullname" . }}
+  labels:
+    {{- include "shopware.labels" . | nindent 4 }}
+    app.kubernetes.io/component: shopware
+spec:
+  replicas: {{ .Values.shopware.replicas }}
+  selector:
+    matchLabels:
+      {{- include "shopware.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: shopware
+  template:
+    metadata:
+      labels:
+        {{- include "shopware.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: shopware
+    spec:
+      containers:
+        - name: shopware
+          image: "{{ .Values.shopware.image.repository }}:{{ .Values.shopware.image.tag }}"
+          imagePullPolicy: {{ .Values.shopware.image.pullPolicy }}
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: {{ include "shopware.fullname" . }}-config
+            - secretRef:
+                name: {{ include "shopware.fullname" . }}-secret
+          resources:
+            {{- toYaml .Values.shopware.resources | nindent 12 }}
+          readinessProbe:
+            httpGet:
+              path: /api/_info/health-check
+              port: 8000
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /api/_info/health-check
+              port: 8000
+            initialDelaySeconds: 120
+            periodSeconds: 30
+            timeoutSeconds: 5

@@ -1,0 +1,14 @@
+{{- if .Values.mysql.enabled -}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "shopware.fullname" . }}-mysql-data
+  labels:
+    {{- include "shopware.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.mysql.storage.size }}
+{{- end }}
